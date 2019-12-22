@@ -3,7 +3,7 @@
   "displayName": "CollapsibleTabViewExample",
   "expo": {
     "name": "CollapsibleTabViewExample",
-    "slug": "expo-template-bare",
+    "slug": "collapsible-tab-view-example",
     "privacy": "unlisted",
     "sdkVersion": "36.0.0",
     "version": "1.0.0",
