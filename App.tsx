@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useRef } from "react";
-import { SafeAreaView, Dimensions, View } from "react-native";
+import { SafeAreaView, Dimensions, View, FlatList } from "react-native";
 import Animated from "react-native-reanimated";
 import { TabView, TabBar } from "react-native-tab-view";
 import ExampleHeader from "./ExampleHeader";
@@ -28,7 +28,6 @@ const App: React.FC = () => {
     })
   ).current;
 
-  // react-native-tab-view
   const [index, setIndex] = useState(0);
   const routes = [
     {
@@ -38,9 +37,18 @@ const App: React.FC = () => {
     { key: "Tab 2", title: "Tab 2" }
   ];
 
+  const [listRefs] = useState(() => {
+    const refs: { [key: string]: React.RefObject<FlatList<any>> } = {};
+    for (const route of routes) {
+      refs[route.key] = React.createRef();
+    }
+    return refs;
+  });
+
   const renderScene = useCallback(({ route }) => {
     return (
       <ExampleTab
+        ref={listRefs[route.key]}
         scrollContentContainerStyle={{ paddingTop: TOTAL_HEADER_HEIGHT }}
         onScroll={Animated.event([
           { nativeEvent: { contentOffset: { y: scrollY } } }
@@ -48,6 +56,13 @@ const App: React.FC = () => {
       />
     );
   }, []);
+
+  const handleTabChange = () => {
+    listRefs["Tab 2"].current.getNode().scrollToOffset({
+      offset: 50,
+      animated: false
+    });
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
@@ -63,6 +78,7 @@ const App: React.FC = () => {
         />
 
         <TabView
+          onSwipeStart={() => console.log(`swipe start (index = ${index})`)}
           navigationState={{ index, routes }}
           renderScene={renderScene}
           renderTabBar={props => (
@@ -77,7 +93,7 @@ const App: React.FC = () => {
                 backgroundColor: "rgb(239, 243, 252)"
               }}
             >
-              <TabBar {...props} />
+              <TabBar {...props} onTabPress={() => handleTabChange()} />
             </Animated.View>
           )}
           initialLayout={initialLayout}
